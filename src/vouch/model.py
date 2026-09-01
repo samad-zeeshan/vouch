@@ -20,7 +20,10 @@ List every claim in the draft that the fact sheet could confirm or deny: names, 
 Rules:
 - Use the fact sheet as the only source of truth. Do not use anything you know from elsewhere.
 - Leave numbers, money, percentages and years alone. Code checks those separately. Do not list a claim whose substance is a number.
-- Skip the headline, quoted speech and who said it, contact details and calls to action.
+- List every checkable claim. When the sheet says nothing about a claim, still list it, as unsupported. Staying silent about a checkable claim is always wrong.
+- The first line of the draft is the headline. Take no claim from it.
+- A person's job title, and which company they belong to, are claims. If the sheet says otherwise for that person, the claim is contradicted, citing that fact.
+- Skip quoted speech and who said it, contact details and calls to action.
 - "supported" needs a fact ID that confirms the claim. "contradicted" needs a fact ID the claim conflicts with. When no fact speaks to the claim, use "unsupported" and set fact_id to null.
 - "text" is the shortest exact substring of the draft that carries the claim. "sentence" is the exact sentence it sits in, copied verbatim, so the claim can be located.
 - "reason" is one plain sentence a PR consultant can read. For "unsupported", name what kind of fact is missing.
