@@ -25,7 +25,8 @@ approve.
 ## Who uses it
 
 - The PR consultant. They paste, click, read the colours, fix the draft, and click again.
-  They never see a fact ID, a prompt, or raw JSON.
+  They never see a prompt or raw JSON. A reason may name a sheet line, like "Matches F2",
+  because reasons are shown exactly as the checker wrote them.
 - The person reviewing this repo. They clone it, run one command, and watch the sample draft
   light up.
 
@@ -224,7 +225,8 @@ Everything is required unless it says "Nice to have".
 
 **AC-016 Hover explains in one sentence**
 - Given: hover over any highlight.
-- Then: a tooltip shows the `reason` text. No fact IDs, no JSON.
+- Then: a tooltip shows the `reason` text word for word, on keyboard focus as well as hover.
+  No JSON, nothing invented by the page.
 - Checked by: by hand.
 
 **AC-017 Approve is gated**
