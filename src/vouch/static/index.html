@@ -24,6 +24,8 @@
   #banner { grid-column: 1 / -1; display: none; padding: 10px 14px; border-radius: 6px; background: #fff3cd; border: 1px solid #f0d27a; }
   #banner.show { display: block; }
   mark { padding: 1px 2px; border-radius: 3px; background: none; color: inherit; cursor: help; }
+  .view mark { transition: opacity 180ms ease-out; }
+  .view.fresh mark { opacity: 0; transition: none; }
   mark.supported { background: var(--green); }
   mark.rounded_up { background: var(--orange); }
   mark.contradicted { background: var(--red); }
@@ -146,6 +148,17 @@
     else approveBtn.setAttribute("data-tip", why);
   }
 
+  // The one intentional motion on the page: highlights fade in once, staggered, with the
+  // delay capped so a long draft never takes more than 400ms to light up. Only opacity moves.
+  function revealMarks() {
+    view.querySelectorAll("mark").forEach((m, i) => {
+      m.style.transitionDelay = Math.min(i * 25, 220) + "ms";
+    });
+    view.classList.add("fresh");
+    void view.offsetWidth;
+    requestAnimationFrame(() => view.classList.remove("fresh"));
+  }
+
   function showEditor() {
     view.hidden = true; draft.hidden = false; editBtn.hidden = true;
   }
@@ -173,6 +186,7 @@
       const result = await res.json();
       view.innerHTML = render(draft.value, result.claims);
       draft.hidden = true; view.hidden = false; editBtn.hidden = false;
+      revealMarks();
       summary.textContent = words(result.summary);
       const why = result.warnings.filter((w) => !w.startsWith("model verdict"));
       banner.textContent = why.join(" ");
