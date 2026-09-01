@@ -8,19 +8,21 @@
   :root { --ink: #1c1c1c; --muted: #666; --line: #ddd; --green: #d8f3dc; --orange: #ffe0b2; --red: #ffd6d6; }
   * { box-sizing: border-box; }
   body { margin: 0; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); background: #fafafa; }
-  header { padding: 18px 28px; border-bottom: 1px solid var(--line); background: #fff; display: flex; align-items: baseline; gap: 16px; }
+  header { padding: 16px 24px; border-bottom: 1px solid var(--line); background: #fff; display: flex; align-items: baseline; gap: 16px; }
   header h1 { margin: 0; font-size: 20px; }
   header p { margin: 0; color: var(--muted); }
-  main { max-width: 1200px; margin: 0 auto; padding: 24px 28px; display: grid; grid-template-columns: 3fr 2fr; gap: 24px; }
+  main { max-width: 1200px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: 3fr 2fr; gap: 24px; }
   @media (max-width: 800px) { main { grid-template-columns: 1fr; } }
-  label { display: block; font-weight: 600; margin-bottom: 6px; }
+  label { display: block; font-weight: 600; margin-bottom: 8px; }
+  :focus-visible { outline: 2px solid #3a5ccc; outline-offset: 2px; }
   textarea, .view { width: 100%; min-height: 380px; padding: 14px; font: 15px/1.6 Georgia, serif; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
   textarea { resize: vertical; }
   textarea:disabled { background: #fff; color: inherit; }
   #draft, .view { transition: opacity 150ms ease-out; }
   main.busy #draft, main.busy .view { opacity: .6; }
   .view { white-space: pre-wrap; overflow-wrap: anywhere; }
-  .actions { grid-column: 1 / -1; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .actions { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  #summary { margin-left: auto; font-weight: 600; }
   button { padding: 9px 18px; font: inherit; border-radius: 6px; border: 1px solid #333; background: #333; color: #fff; cursor: pointer; }
   button.secondary { background: #fff; color: var(--ink); }
   button:disabled, button[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
@@ -33,8 +35,8 @@
   mark.rounded_up { background: var(--orange); }
   mark.contradicted { background: var(--red); }
   mark.unsupported { text-decoration: underline dashed #777; text-underline-offset: 3px; }
-  .legend { grid-column: 1 / -1; color: var(--muted); font-size: 13px; }
-  .legend mark { margin-right: 10px; }
+  .legend { grid-column: 1 / -1; color: var(--muted); font-size: 12px; }
+  .legend mark { margin-right: 8px; padding: 0 4px; cursor: default; }
   #approved { font-weight: 600; color: #1b5e20; }
   #tooltip { position: absolute; z-index: 10; max-width: 320px; padding: 6px 10px;
     font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; background: #1c1c1c;
