@@ -9,7 +9,12 @@ says nothing about it. Hover any colour and you get a one-line reason. The Appro
 stays off until there is nothing red or orange left.
 
 This spec was written before any code. Every acceptance criterion below is something you can
-watch happen, or watch fail. Revision 1, 2026-09-01.
+watch happen, or watch fail. Revision 2, 2026-09-01.
+
+Revision 2, after testing against a live sheet: a number that clashes with a labelled fact is
+contradicted, not unsupported (AC-023), and a number the sheet does not approve blocks Approve
+(AC-017). Revision 1 let "$13 million" pass as a dashed underline while the sheet's own Funding
+round line said $22 million.
 
 ## Goal
 
@@ -83,6 +88,7 @@ Response:
   "claims": [
     { "text": "founded in 2018", "start": 212, "end": 227,
       "state": "contradicted", "fact_id": "F3",
+      "source": "numeric",
       "reason": "Sheet says 2019. Draft says 2018." }
   ],
   "summary": { "checked": 9, "supported": 6, "rounded_up": 1,
@@ -94,7 +100,8 @@ Response:
 ```
 
 `start` and `end` are character positions in the draft, exactly as it was sent. That lets
-the page underline the right words without having to work out the text again.
+the page underline the right words without having to work out the text again. `source` says
+which layer judged the claim: `numeric`, `model`, or `quote`.
 
 ## Acceptance criteria
 
@@ -151,7 +158,14 @@ Everything is required unless it says "Nice to have".
 **AC-008 A number with nothing close on the sheet is unsupported**
 - Given: draft says `900 employees`; the sheet has no employee figure.
 - Then: `unsupported`, reason "No number on the sheet is within 25 percent of 900."
+- Must not: call it contradicted, because no fact about employees exists to contradict.
 - Checked by: unit test.
+
+**AC-023 A number that clashes with a labelled fact is contradicted**
+- Given: draft says `a $13 million funding round`; sheet says `Funding round: $22 million`.
+- Then: `contradicted`, citing that fact, reason "Sheet says $22M. Draft says $13M."
+- Must not: fall back to `unsupported` when the fact's own label sits in the same sentence.
+- Checked by: unit test and eval case. Added in revision 2.
 
 **AC-009 On numbers, the code has the last word**
 - Given: the model, for whatever reason, gives a different state to a span the code layer
@@ -214,9 +228,10 @@ Everything is required unless it says "Nice to have".
 - Checked by: by hand.
 
 **AC-017 Approve is gated**
-- Given: there is any `contradicted` or `rounded_up` claim, or `model_used` is false.
+- Given: there is any `contradicted` or `rounded_up` claim, any `unsupported` numeric claim,
+  or `model_used` is false.
 - Then: Approve is disabled, and hovering it says why ("1 contradicted, 1 rounded up").
-- Given: only `supported` and `unsupported` claims remain, and the model ran.
+- Given: only `supported` claims and `unsupported` prose claims remain, and the model ran.
 - Then: Approve is enabled. Clicking it shows "Approved" and nothing more (nothing is saved;
   see "What is out").
 - Checked by: by hand, plus a unit test on the `approvable` rule.
@@ -296,7 +311,9 @@ build.
 ## Open questions (answered by assumption for revision 1)
 
 - Q1. Should `rounded_up` block Approve, or only warn? Assumed: block (A2).
-- Q2. Should `unsupported` block Approve? Assumed: warn only (A3).
+- Q2. Should `unsupported` block Approve? Revision 1 assumed warn only. Revision 2 splits it:
+  an unsupported number blocks, an unsupported prose claim warns. A3 only ever argued for
+  prose, and the goal says no unapproved number gets through.
 
 ## Build order
 
