@@ -96,6 +96,8 @@
     const s = result.summary, parts = [];
     if (s.contradicted) parts.push(s.contradicted + " contradicted");
     if (s.rounded_up) parts.push(s.rounded_up + " rounded up");
+    const loose = result.claims.filter((c) => c.state === "unsupported" && c.source === "numeric").length;
+    if (loose) parts.push(loose + (loose > 1 ? " numbers" : " number") + " not on the sheet");
     if (!result.model_used) parts.push("prose claims were not checked");
     return parts.join(", ");
   }

@@ -48,10 +48,14 @@ class CheckResult:
 
 
 def approvable(claims: list[Claim], model_used: bool) -> bool:
-    # A check the model never ran is not a check (AC-014). Unsupported does not block (A3).
+    # A check the model never ran is not a check (AC-014).
     if not model_used:
         return False
-    return not any(c.state in ("contradicted", "rounded_up") for c in claims)
+    if any(c.state in ("contradicted", "rounded_up") for c in claims):
+        return False
+    # An unapproved number is the exact thing the goal forbids, so it blocks too. Unsupported
+    # prose only warns (A3), because a deliberate boast is sometimes the point.
+    return not any(c.state == "unsupported" and c.source == "numeric" for c in claims)
 
 
 def merge(numeric: list[Claim], prose: list[Claim], warnings: list[str]) -> list[Claim]:

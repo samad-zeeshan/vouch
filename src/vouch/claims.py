@@ -22,5 +22,6 @@ class Claim:
             "end": self.end,
             "state": self.state,
             "fact_id": self.fact_id,
+            "source": self.source,
             "reason": self.reason,
         }

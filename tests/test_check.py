@@ -67,11 +67,16 @@ def test_sheet_warnings_reach_the_response():
 
 def test_approvable_rule():
     ok = Claim("a", 0, 1, "supported", "r")
-    warn = Claim("b", 0, 1, "unsupported", "r")
-    assert approvable([ok, warn], model_used=True) is True
-    assert approvable([ok, warn], model_used=False) is False
+    boast = Claim("b", 0, 1, "unsupported", "r", source="model")
+    assert approvable([ok, boast], model_used=True) is True
+    assert approvable([ok, boast], model_used=False) is False
     for state in ("rounded_up", "contradicted"):
         assert approvable([ok, Claim("c", 0, 1, state, "r")], model_used=True) is False
+
+
+def test_a_number_the_sheet_does_not_approve_blocks():
+    loose = Claim("900", 0, 3, "unsupported", "r", source="numeric")
+    assert approvable([loose], model_used=True) is False
 
 
 def test_merge_leaves_numeric_claims_untouched():
