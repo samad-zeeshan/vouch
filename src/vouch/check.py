@@ -5,8 +5,10 @@ from dataclasses import dataclass, field
 from typing import Protocol
 
 from vouch.claims import STATES, Claim
+from vouch.config import check_quotes
 from vouch.facts import FactSheet, parse_facts
 from vouch.numeric import judge_numbers
+from vouch.quotes import judge_quotes
 
 
 @dataclass
@@ -68,6 +70,9 @@ def check(draft: str, facts: str, prose_checker: ProseChecker | None = None) -> 
     sheet = parse_facts(facts)
     warnings = list(sheet.warnings)
     numeric = judge_numbers(draft, sheet)
+    # Quote verdicts come from code too, so they sit with the numeric ones and outrank the model.
+    if check_quotes():
+        numeric = sorted(numeric + judge_quotes(draft, sheet), key=lambda c: c.start)
 
     if prose_checker is None:
         warnings.append("Prose claims were not checked: model is off")
