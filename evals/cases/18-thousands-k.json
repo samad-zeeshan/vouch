@@ -1,0 +1,12 @@
+{
+  "name": "18-thousands-k",
+  "layer": "numeric",
+  "draft": "It processed 1,200k transactions last quarter.",
+  "facts": "Transactions: 1.2 million\n",
+  "expected": [
+    {
+      "text": "1,200k",
+      "state": "supported"
+    }
+  ]
+}

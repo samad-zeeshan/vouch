@@ -1,0 +1,12 @@
+{
+  "name": "17-aed-currency",
+  "layer": "numeric",
+  "draft": "The round was backed by AED 5 million in local funding.",
+  "facts": "Local funding: AED 5 million\n",
+  "expected": [
+    {
+      "text": "AED 5 million",
+      "state": "supported"
+    }
+  ]
+}

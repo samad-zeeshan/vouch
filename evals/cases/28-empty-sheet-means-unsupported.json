@@ -1,0 +1,12 @@
+{
+  "name": "28-empty-sheet-means-unsupported",
+  "layer": "model",
+  "draft": "Falcon Pay is headquartered in Dubai.",
+  "facts": "",
+  "expected": [
+    {
+      "text": "headquartered in Dubai",
+      "state": "unsupported"
+    }
+  ]
+}

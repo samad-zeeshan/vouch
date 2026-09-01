@@ -1,0 +1,12 @@
+{
+  "name": "22-title-mismatch",
+  "layer": "model",
+  "draft": "CTO Layla Haddad joined the announcement.",
+  "facts": "Company: Falcon Pay\nFunding round: $12.4 million, Series A\nFounded: 2019\nCEO: Layla Haddad\nCustomers: 38,412\nHeadquarters: Dubai\nLead investor: Gulf Ventures\nProduct: cross-border payments app for small businesses\n",
+  "expected": [
+    {
+      "text": "CTO Layla Haddad",
+      "state": "contradicted"
+    }
+  ]
+}

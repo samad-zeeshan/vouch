@@ -1,0 +1,12 @@
+{
+  "name": "25-future-plan",
+  "layer": "model",
+  "draft": "Falcon Pay plans to expand into Saudi Arabia next year.",
+  "facts": "Company: Falcon Pay\nFunding round: $12.4 million, Series A\nFounded: 2019\nCEO: Layla Haddad\nCustomers: 38,412\nHeadquarters: Dubai\nLead investor: Gulf Ventures\nProduct: cross-border payments app for small businesses\n",
+  "expected": [
+    {
+      "text": "expand into Saudi Arabia",
+      "state": "unsupported"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "19-percent-both-ways",
+  "layer": "numeric",
+  "draft": "Margins grew 40 percent while churn fell 5%.",
+  "facts": "Margin growth: 40%\nChurn drop: 5%\n",
+  "expected": [
+    {
+      "text": "40 percent",
+      "state": "supported"
+    },
+    {
+      "text": "5%",
+      "state": "supported"
+    }
+  ]
+}

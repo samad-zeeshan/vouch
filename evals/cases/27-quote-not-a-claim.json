@@ -1,0 +1,7 @@
+{
+  "name": "27-quote-not-a-claim",
+  "layer": "model",
+  "draft": "\"We are the best payments company in the world,\" said Layla Haddad.",
+  "facts": "Company: Falcon Pay\nFunding round: $12.4 million, Series A\nFounded: 2019\nCEO: Layla Haddad\nCustomers: 38,412\nHeadquarters: Dubai\nLead investor: Gulf Ventures\nProduct: cross-border payments app for small businesses\n",
+  "expected": []
+}
