@@ -1,0 +1,12 @@
+{
+  "name": "01-exact-money",
+  "layer": "numeric",
+  "draft": "Falcon Pay closed a $12.4 million round.",
+  "facts": "Company: Falcon Pay\nFunding round: $12.4 million, Series A\nFounded: 2019\nCEO: Layla Haddad\nCustomers: 38,412\nHeadquarters: Dubai\nLead investor: Gulf Ventures\nProduct: cross-border payments app for small businesses\n",
+  "expected": [
+    {
+      "text": "$12.4 million",
+      "state": "supported"
+    }
+  ]
+}

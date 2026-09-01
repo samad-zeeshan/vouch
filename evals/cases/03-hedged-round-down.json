@@ -1,0 +1,12 @@
+{
+  "name": "03-hedged-round-down",
+  "layer": "numeric",
+  "draft": "It serves over 38,000 customers.",
+  "facts": "Company: Falcon Pay\nFunding round: $12.4 million, Series A\nFounded: 2019\nCEO: Layla Haddad\nCustomers: 38,412\nHeadquarters: Dubai\nLead investor: Gulf Ventures\nProduct: cross-border payments app for small businesses\n",
+  "expected": [
+    {
+      "text": "over 38,000",
+      "state": "supported"
+    }
+  ]
+}

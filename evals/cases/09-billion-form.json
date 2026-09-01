@@ -1,0 +1,12 @@
+{
+  "name": "09-billion-form",
+  "layer": "numeric",
+  "draft": "It processed $1.2bn in payments.",
+  "facts": "Payments processed: $1.2 billion\n",
+  "expected": [
+    {
+      "text": "$1.2bn",
+      "state": "supported"
+    }
+  ]
+}

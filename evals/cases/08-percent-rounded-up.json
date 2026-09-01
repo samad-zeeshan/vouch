@@ -1,0 +1,12 @@
+{
+  "name": "08-percent-rounded-up",
+  "layer": "numeric",
+  "draft": "Revenue grew 45 percent year on year.",
+  "facts": "Revenue growth: 40%\n",
+  "expected": [
+    {
+      "text": "45 percent",
+      "state": "rounded_up"
+    }
+  ]
+}

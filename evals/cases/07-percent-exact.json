@@ -1,0 +1,12 @@
+{
+  "name": "07-percent-exact",
+  "layer": "numeric",
+  "draft": "Revenue grew 40% year on year.",
+  "facts": "Revenue growth: 40%\n",
+  "expected": [
+    {
+      "text": "40%",
+      "state": "supported"
+    }
+  ]
+}

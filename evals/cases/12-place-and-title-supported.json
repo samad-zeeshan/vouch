@@ -1,0 +1,16 @@
+{
+  "name": "12-place-and-title-supported",
+  "layer": "model",
+  "draft": "Falcon Pay is headquartered in Dubai and led by CEO Layla Haddad.",
+  "facts": "Company: Falcon Pay\nFunding round: $12.4 million, Series A\nFounded: 2019\nCEO: Layla Haddad\nCustomers: 38,412\nHeadquarters: Dubai\nLead investor: Gulf Ventures\nProduct: cross-border payments app for small businesses\n",
+  "expected": [
+    {
+      "text": "headquartered in Dubai",
+      "state": "supported"
+    },
+    {
+      "text": "led by CEO Layla Haddad",
+      "state": "supported"
+    }
+  ]
+}

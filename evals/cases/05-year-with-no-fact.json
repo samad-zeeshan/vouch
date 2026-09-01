@@ -1,0 +1,12 @@
+{
+  "name": "05-year-with-no-fact",
+  "layer": "numeric",
+  "draft": "The app launched in 2021.",
+  "facts": "Company: Falcon Pay\nHeadquarters: Dubai\n",
+  "expected": [
+    {
+      "text": "2021",
+      "state": "unsupported"
+    }
+  ]
+}

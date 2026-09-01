@@ -1,0 +1,12 @@
+{
+  "name": "04-year-off-by-one",
+  "layer": "numeric",
+  "draft": "Founded in 2018, it grew fast.",
+  "facts": "Company: Falcon Pay\nFunding round: $12.4 million, Series A\nFounded: 2019\nCEO: Layla Haddad\nCustomers: 38,412\nHeadquarters: Dubai\nLead investor: Gulf Ventures\nProduct: cross-border payments app for small businesses\n",
+  "expected": [
+    {
+      "text": "2018",
+      "state": "contradicted"
+    }
+  ]
+}
