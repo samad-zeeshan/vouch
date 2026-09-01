@@ -56,8 +56,8 @@
   button:active { transform: scale(0.98); }
   button.secondary { background: var(--card); border-color: var(--line); color: var(--ink); }
   button.secondary:hover { background: var(--bg); border-color: var(--line); }
-  #approve { background: var(--ok); border-color: var(--ok); }
-  #approve:hover { background: #166534; border-color: #166534; }
+  #approve[aria-disabled="false"] { background: var(--ok); border-color: var(--ok); }
+  #approve[aria-disabled="false"]:hover { background: #166534; border-color: #166534; }
   button:disabled, button[aria-disabled="true"] { background: #e2e8f0; border-color: #e2e8f0;
     color: var(--muted); cursor: not-allowed; transform: none; }
   #approved { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--ok); }
