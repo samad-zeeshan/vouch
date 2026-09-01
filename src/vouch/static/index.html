@@ -6,138 +6,396 @@
 <title>Vouch</title>
 <style>
   :root {
-    --ink: #0f172a; --ink-2: #334155; --muted: #64748b;
-    --line: #e2e8f0; --bg: #f8fafc; --card: #ffffff; --accent: #2563eb;
-    --green-bg: #d5eedd; --green-line: #15803d;
-    --orange-bg: #fde8c8; --orange-line: #c2410c;
-    --red-bg: #fcdcdc; --red-line: #dc2626;
-    --ok: #15803d;
+    --bg: #0b0a08; --panel: #15110c; --card: #16120d; --edge: #2a2118; --edge-2: #40331f;
+    --text: #f3ede4; --muted: #b3a58f; --accent: #f97316; --accent-hi: #fb8c3c;
+    --accent-2: #fdba74; --btn-ink: #1a0d02;
+    --glow: rgba(249, 115, 22, 0.13); --glow-2: rgba(249, 115, 22, 0.07);
+    --green-wash: rgba(34, 197, 94, 0.16); --green-line: #4ade80;
+    --orange-wash: rgba(249, 115, 22, 0.18); --orange-line: #fb923c;
+    --red-wash: rgba(239, 68, 68, 0.17); --red-line: #f87171;
+    --dash: #a89a84;
+    --ok: #16a34a; --ok-hi: #15803d; --ok-text: #4ade80;
+    --bar-recall: #ea580c; --bar-precision: #3b82f6;
     --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
     --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     --serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
   }
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
-  body { margin: 0; font: 15px/1.5 var(--sans); color: var(--ink); background: var(--bg);
-    -webkit-font-smoothing: antialiased; }
-  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; font: 15px/1.6 var(--sans); color: var(--text); background: var(--bg);
+    -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body::before { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(900px 480px at 72% -8%, var(--glow-2), transparent 70%); }
+  #glow { position: fixed; top: 0; left: 0; width: 640px; height: 640px; border-radius: 50%;
+    pointer-events: none; z-index: 0; will-change: transform;
+    background: radial-gradient(circle, var(--glow) 0%, transparent 62%); }
+  header, .hero, .wrap, footer { position: relative; z-index: 1; }
+  :focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ::selection { background: rgba(249, 115, 22, 0.32); }
 
-  header { padding: 18px 32px; background: var(--card); border-bottom: 1px solid var(--line);
-    display: flex; align-items: center; gap: 12px; }
-  header svg { display: block; }
-  header h1 { margin: 0; font-size: 19px; font-weight: 700; letter-spacing: -0.02em; }
-  header p { margin: 0 0 0 12px; color: var(--muted); font-size: 14px; }
-  @media (max-width: 640px) { header p { display: none; } }
+  header { position: sticky; top: 0; z-index: 5; padding: 14px 32px;
+    background: rgba(11, 10, 8, 0.88); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--edge); display: flex; align-items: center; gap: 12px; }
+  header svg rect { fill: var(--accent); }
+  header h1 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+  nav { margin-left: auto; display: flex; gap: 22px; font-size: 14px; }
+  nav a { color: var(--muted); transition: color 150ms ease; }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  @media (max-width: 760px) { nav { display: none; } }
 
-  main { max-width: 1280px; margin: 0 auto; padding: 32px; display: grid;
-    grid-template-columns: 3fr 2fr; gap: 24px; align-items: start; }
-  @media (max-width: 880px) { main { grid-template-columns: 1fr; padding: 20px; } }
+  .hero { max-width: 1120px; margin: 0 auto; padding: 96px 32px 72px; }
+  .kicker { font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--accent-2); margin-bottom: 20px; }
+  .hero h2 { margin: 0 0 24px; font: 600 clamp(34px, 5.4vw, 62px)/1.22 var(--serif);
+    letter-spacing: -0.015em; max-width: 21ch; }
+  .hero h2 mark { padding: 0 10px; border-radius: 8px; white-space: nowrap; cursor: default; }
+  .hero p { margin: 0 0 36px; font-size: 18px; line-height: 1.65; color: var(--muted); max-width: 62ch; }
+  .hero .btns { display: flex; gap: 12px; flex-wrap: wrap; }
 
-  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 10px;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04); overflow: hidden; }
-  .panel label { display: flex; align-items: center; padding: 12px 20px; font-size: 12px;
-    font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
-    border-bottom: 1px solid var(--line); }
-  textarea, .view { width: 100%; min-height: 440px; padding: 20px; border: 0; margin: 0;
-    font: 16px/1.7 var(--serif); color: var(--ink); background: var(--card); display: block; }
+  .btn, .actions button { display: inline-flex; align-items: center; justify-content: center;
+    padding: 0 22px; height: 44px; border-radius: 9px; font: 600 14.5px/1 var(--sans);
+    cursor: pointer; touch-action: manipulation; border: 1px solid var(--accent);
+    background: var(--accent); color: var(--btn-ink);
+    transition: background 150ms ease, border-color 150ms ease, color 150ms ease,
+                transform 120ms var(--ease-out); }
+  .btn:hover, .actions button:hover { background: var(--accent-hi); border-color: var(--accent-hi);
+    text-decoration: none; }
+  .btn:active, .actions button:active { transform: scale(0.97); }
+  .btn.ghost, .actions button.secondary { background: transparent; border-color: var(--edge-2);
+    color: var(--text); }
+  .btn.ghost:hover, .actions button.secondary:hover { background: var(--card);
+    border-color: var(--edge-2); }
+  #approve[aria-disabled="false"] { background: var(--ok); border-color: var(--ok); color: #fff; }
+  #approve[aria-disabled="false"]:hover { background: var(--ok-hi); border-color: var(--ok-hi); }
+  .actions button:disabled, .actions button[aria-disabled="true"] { background: var(--card);
+    border-color: var(--edge); color: var(--muted); cursor: not-allowed; transform: none; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 32px 72px; }
+  section.block { padding-top: 72px; }
+  .block .kicker { margin-bottom: 10px; }
+  .block h3 { margin: 0 0 28px; font: 600 30px/1.25 var(--serif); letter-spacing: -0.01em; }
+
+  #checker .grid { display: grid; grid-template-columns: 3fr 2fr; gap: 20px; align-items: start; }
+  @media (max-width: 880px) { #checker .grid { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--edge); border-radius: 12px;
+    overflow: hidden; box-shadow: 0 12px 34px rgba(0, 0, 0, 0.35); }
+  .panel label { display: flex; padding: 12px 20px; font-size: 12px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+    border-bottom: 1px solid var(--edge); }
+  textarea, .view { width: 100%; min-height: 430px; padding: 20px; border: 0; margin: 0;
+    display: block; font: 16px/1.75 var(--serif); color: var(--text); background: var(--panel);
+    caret-color: var(--accent); }
   textarea { resize: vertical; }
   textarea:focus-visible { outline-offset: -2px; }
   textarea:disabled { color: inherit; }
   .view { white-space: pre-wrap; overflow-wrap: anywhere; }
   #draft, .view { transition: opacity 150ms var(--ease-out); }
-  main.busy #draft, main.busy .view { opacity: .55; }
+  .grid.busy #draft, .grid.busy .view { opacity: .55; }
 
-  .actions { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  button { padding: 10px 20px; min-height: 40px; font: 600 14px/1 var(--sans); cursor: pointer;
-    touch-action: manipulation; border-radius: 8px; border: 1px solid var(--accent);
-    background: var(--accent); color: #fff;
-    transition: background 120ms ease, border-color 120ms ease, transform 100ms var(--ease-out); }
-  button:hover { background: #1d4ed8; border-color: #1d4ed8; }
-  button:active { transform: scale(0.98); }
-  button.secondary { background: var(--card); border-color: var(--line); color: var(--ink); }
-  button.secondary:hover { background: var(--bg); border-color: var(--line); }
-  #approve[aria-disabled="false"] { background: var(--ok); border-color: var(--ok); }
-  #approve[aria-disabled="false"]:hover { background: #166534; border-color: #166534; }
-  button:disabled, button[aria-disabled="true"] { background: #e2e8f0; border-color: #e2e8f0;
-    color: var(--muted); cursor: not-allowed; transform: none; }
-  #approved { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--ok); }
-  #summary { margin-left: auto; font-weight: 600; font-size: 14px; color: var(--ink-2); }
+  .actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+  #approved { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--ok-text); }
+  #summary { margin-left: auto; font-weight: 600; font-size: 14px; }
   @media (max-width: 880px) { #summary { margin-left: 0; flex-basis: 100%; } }
 
-  #banner { grid-column: 1 / -1; display: none; padding: 12px 16px; border-radius: 8px;
-    font-size: 14px; background: #fef6e0; border: 1px solid #f0dfae; color: #713f12; }
+  #banner { display: none; margin-top: 20px; padding: 12px 16px; border-radius: 8px; font-size: 14px;
+    background: #2a2008; border: 1px solid #57430f; color: #fbdf93; }
   #banner.show { display: block; }
 
-  mark { padding: 1px 3px; border-radius: 3px; background: none; color: inherit; cursor: help; }
-  mark.supported { background: var(--green-bg); box-shadow: inset 0 -2px 0 var(--green-line); }
-  mark.rounded_up { background: var(--orange-bg); box-shadow: inset 0 -2px 0 var(--orange-line); }
-  mark.contradicted { background: var(--red-bg); box-shadow: inset 0 -2px 0 var(--red-line); }
-  mark.unsupported { text-decoration: underline dashed var(--muted); text-underline-offset: 4px;
+  mark { padding: 1px 4px; border-radius: 4px; background: none; color: var(--text); cursor: help; }
+  mark.supported { background: var(--green-wash); box-shadow: inset 0 -2px 0 var(--green-line); }
+  mark.rounded_up { background: var(--orange-wash); box-shadow: inset 0 -2px 0 var(--orange-line); }
+  mark.contradicted { background: var(--red-wash); box-shadow: inset 0 -2px 0 var(--red-line); }
+  mark.unsupported { text-decoration: underline dashed var(--dash); text-underline-offset: 4px;
     text-decoration-thickness: 1.5px; }
   .view mark { transition: opacity 180ms var(--ease-out); }
   .view.fresh mark { opacity: 0; transition: none; }
 
-  .legend { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; color: var(--muted);
-    font-size: 12px; }
-  .legend mark { cursor: default; padding: 2px 8px; border-radius: 999px; font-family: var(--sans); }
-  .legend mark.unsupported { text-underline-offset: 3px; }
+  .legend { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .legend mark { cursor: default; padding: 5px 13px; border-radius: 999px;
+    font: 600 12px/1 var(--sans); color: var(--text); box-shadow: none; }
+  .legend mark.supported { background: var(--green-wash); border: 1px solid rgba(74, 222, 128, 0.35); }
+  .legend mark.rounded_up { background: var(--orange-wash); border: 1px solid rgba(251, 146, 60, 0.35); }
+  .legend mark.contradicted { background: var(--red-wash); border: 1px solid rgba(248, 113, 113, 0.35); }
+  .legend mark.unsupported { border: 1px solid var(--edge-2); text-underline-offset: 3px; }
+
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 880px) { .cards { grid-template-columns: 1fr; } }
+  .card, .stat { background: linear-gradient(180deg, #1a1510, #131009);
+    border: 1px solid var(--edge); border-radius: 12px; padding: 22px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    transition: border-color 150ms ease, transform 150ms var(--ease-out),
+                box-shadow 150ms ease; }
+  .card:hover, .stat:hover { border-color: var(--edge-2); transform: translateY(-2px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 10px 26px rgba(0, 0, 0, 0.4); }
+  .card h4 { margin: 0 0 10px; font-size: 16px; }
+  .card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 880px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .stat::before { content: ""; display: block; width: 26px; height: 3px; border-radius: 2px;
+    background: var(--accent); margin-bottom: 16px; }
+  .stat b { display: block; font: 600 42px/1.1 var(--serif); letter-spacing: -0.02em;
+    margin-bottom: 8px; color: var(--accent-2); font-variant-numeric: tabular-nums; }
+  .stat span { color: var(--muted); font-size: 13.5px; line-height: 1.55; display: block; }
+
+  .chart-card { grid-column: 1 / -1; }
+  .chart-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+  .chart-head h4 { margin: 0; }
+  .chart-legend { display: flex; gap: 16px; margin-left: auto; font-size: 12.5px; color: var(--muted); }
+  .chart-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 3px;
+    margin-right: 6px; }
+  .chart-wrap { overflow-x: auto; }
+  .chart-wrap svg { display: block; width: 100%; height: auto; min-width: 460px; }
+  .chart-note { margin: 12px 0 0; color: var(--muted); font-size: 12.5px; }
+  svg .grid-line { stroke: var(--edge); stroke-width: 1; }
+  svg .tick { fill: var(--muted); font: 11px var(--sans); }
+  svg .row-label { fill: var(--text); font: 13px var(--sans); }
+  svg .val { fill: var(--muted); font: 12px var(--sans); font-variant-numeric: tabular-nums; }
+  svg rect[data-tip] { cursor: default; }
+
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 760px) { .cols { grid-template-columns: 1fr; } }
+  .cols .card ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 1.9; }
+
+  .specrow { display: flex; gap: 24px; align-items: stretch; flex-wrap: wrap; }
+  .specrow .card { flex: 1 1 420px; }
+  code { font: 13px/1.6 ui-monospace, "Cascadia Code", Consolas, monospace;
+    background: var(--card); border: 1px solid var(--edge); border-radius: 6px;
+    padding: 2px 7px; color: var(--accent-2); }
+
+  footer { border-top: 1px solid var(--edge); margin-top: 72px; padding: 28px 32px; color: var(--muted);
+    font-size: 13.5px; display: flex; gap: 16px; flex-wrap: wrap; justify-content: space-between;
+    max-width: 1120px; margin-left: auto; margin-right: auto; }
 
   #tooltip { position: absolute; z-index: 10; max-width: 340px; padding: 8px 12px;
-    font: 13px/1.5 var(--sans); background: var(--ink); color: #f8fafc; border-radius: 6px;
-    opacity: 0; transform: translateY(4px);
+    font: 13px/1.5 var(--sans); background: #060402; color: #f6f1e8; border-radius: 6px;
+    border: 1px solid var(--edge-2); opacity: 0; transform: translateY(4px);
     transition: opacity 120ms var(--ease-out), transform 120ms var(--ease-out);
-    pointer-events: none; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.18); }
+    pointer-events: none; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55); }
   #tooltip::after { content: ""; position: absolute; left: 50%; bottom: -5px; margin-left: -5px;
-    border: 5px solid transparent; border-top-color: var(--ink); border-bottom: 0; }
+    border: 5px solid transparent; border-top-color: #060402; border-bottom: 0; }
   #tooltip.below { transform: translateY(-4px); }
   #tooltip.below::after { bottom: auto; top: -5px; border-top-color: transparent;
-    border-bottom: 5px solid var(--ink); border-top: 0; }
+    border-bottom: 5px solid #060402; border-top: 0; }
   #tooltip.show { opacity: 1; transform: translateY(0); }
+
+  .reveal { opacity: 0; transform: translateY(12px); }
+  .reveal:not(.in) { pointer-events: none; }
+  .reveal.in { opacity: 1; transform: none;
+    transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out); }
+  .card.reveal.in:hover, .stat.reveal.in:hover { transform: translateY(-2px); }
 
   @media (prefers-reduced-motion: reduce) {
     * { transition: none !important; animation: none !important; }
+    html { scroll-behavior: auto; }
+    #glow { display: none; }
   }
 </style>
 </head>
 <body>
+<div id="glow" aria-hidden="true"></div>
 <header>
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <rect x="1.5" y="1.5" width="21" height="21" rx="6" fill="#2563eb"/>
-    <path d="M7.2 12.6l3.2 3.2 6.4-7.4" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="1.5" y="1.5" width="21" height="21" rx="6"/>
+    <path d="M7.2 12.6l3.2 3.2 6.4-7.4" stroke="#1a0d02" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
   <h1>Vouch</h1>
-  <p>Paste the draft and the client's approved fact sheet. Click Check.</p>
+  <nav>
+    <a href="#checker">Checker</a>
+    <a href="#how">How it works</a>
+    <a href="#proof">Proof</a>
+    <a href="#scope">Scope</a>
+    <a href="#spec">Spec</a>
+  </nav>
 </header>
+
 <main>
-  <section class="panel">
-    <label for="draft">Draft release</label>
-    <textarea id="draft" spellcheck="false"></textarea>
-    <div id="view" class="view" hidden></div>
-  </section>
-  <section class="panel">
-    <label for="facts">Approved fact sheet</label>
-    <textarea id="facts" spellcheck="false"></textarea>
-  </section>
-  <div id="banner"></div>
-  <div class="actions">
-    <button id="check">Check</button>
-    <button id="edit" class="secondary" hidden>Edit draft</button>
-    <button id="approve" aria-disabled="true" data-tip="Run a check first">Approve</button>
-    <span id="approved" hidden>
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M4.5 12.8l4.7 4.7 10.3-11" stroke="#15803d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      Approved
-    </span>
-    <span id="summary"></span>
+<div class="hero">
+  <div class="kicker">Press-release fact checking</div>
+  <h2>The draft says <mark class="rounded_up">$13 million</mark>. The client approved <mark class="supported">$12.4 million</mark>.</h2>
+  <p>Vouch checks an AI-written press release against the client's approved fact sheet and marks
+     every number, date, and name that does not match, before the client sees it. Nothing red or
+     orange gets approved.</p>
+  <div class="btns">
+    <a class="btn" href="#checker">Run the sample check</a>
+    <a class="btn ghost" href="https://github.com/samad-zeeshan/vouch/blob/main/SPEC.md">Read the spec</a>
   </div>
-  <div class="legend">
-    <mark class="supported">supported</mark>
-    <mark class="rounded_up">rounded up</mark>
-    <mark class="contradicted">contradicted</mark>
-    <mark class="unsupported">unsupported</mark>
-  </div>
+</div>
+
+<div class="wrap">
+  <section class="block" id="checker">
+    <div class="kicker">The checker</div>
+    <h3>Paste, check, fix, approve.</h3>
+    <div class="grid">
+      <section class="panel">
+        <label for="draft">Draft release</label>
+        <textarea id="draft" spellcheck="false"></textarea>
+        <div id="view" class="view" hidden></div>
+      </section>
+      <section class="panel">
+        <label for="facts">Approved fact sheet</label>
+        <textarea id="facts" spellcheck="false"></textarea>
+      </section>
+    </div>
+    <div id="banner"></div>
+    <div class="actions">
+      <button id="check">Check</button>
+      <button id="edit" class="secondary" hidden>Edit draft</button>
+      <button id="approve" aria-disabled="true" data-tip="Run a check first">Approve</button>
+      <span id="approved" hidden>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4.5 12.8l4.7 4.7 10.3-11" stroke="#4ade80" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Approved
+      </span>
+      <span id="summary"></span>
+    </div>
+    <div class="legend">
+      <mark class="supported">supported</mark>
+      <mark class="rounded_up">rounded up</mark>
+      <mark class="contradicted">contradicted</mark>
+      <mark class="unsupported">unsupported</mark>
+    </div>
+  </section>
+
+  <section class="block" id="how">
+    <div class="kicker">01 · How it works</div>
+    <h3>Two layers. The code always wins.</h3>
+    <div class="cards">
+      <div class="card">
+        <h4>Numbers are checked by code</h4>
+        <p>Money, percentages, years and counts are pulled from the draft with exact positions and
+           compared in code. An exact match is green. Up to 25 percent above the sheet is rounded
+           up. Years must match exactly. A number that clashes with a labelled fact goes red.
+           Code cannot hallucinate.</p>
+      </div>
+      <div class="card">
+        <h4>Prose is checked by the model</h4>
+        <p>Names, titles, places and boasts go to DeepSeek with the fact sheet and nothing else.
+           A supported verdict must cite a fact that exists, and the span it quotes must be found
+           in the draft, or the claim is downgraded and the page says so.</p>
+      </div>
+      <div class="card">
+        <h4>Failure never looks like a pass</h4>
+        <p>If the model has an opinion about a span the code already judged, the model loses. If
+           the model times out, refuses or returns broken JSON, the numbers still show, a banner
+           says prose was not checked, and Approve stays locked.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="proof">
+    <div class="kicker">02 · Proof</div>
+    <h3>Measured, not promised.</h3>
+    <div class="stats">
+      <div class="stat"><b data-count="64">64</b><span>tests, all running offline against a fake model, on every push.</span></div>
+      <div class="stat"><b data-count="28">28</b><span>labelled eval cases across both layers, misses printed, never hidden.</span></div>
+      <div class="stat"><b data-count="100" data-suffix="%">100%</b><span>numeric recall. CI fails the build if it ever drops below 100.</span></div>
+      <div class="stat"><b data-count="100" data-suffix="%">100%</b><span>contradicted recall on the model layer, after three measured prompt iterations.</span></div>
+    </div>
+    <div class="card chart-card">
+      <div class="chart-head">
+        <h4>Model layer, measured on 15 labelled cases</h4>
+        <div class="chart-legend" aria-hidden="true">
+          <span><i style="background:var(--bar-precision)"></i>Precision</span>
+          <span><i style="background:var(--bar-recall)"></i>Recall</span>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <svg viewBox="0 0 560 236" role="img"
+             aria-label="Bar chart of model layer precision and recall by state. Supported: precision 71.4 percent, recall 100 percent. Contradicted: precision 71.4 percent, recall 100 percent. Unsupported: precision 60 percent, recall 75 percent.">
+          <g aria-hidden="true">
+            <line class="grid-line" x1="120" y1="8" x2="120" y2="200"/>
+            <line class="grid-line" x1="320" y1="8" x2="320" y2="200"/>
+            <line class="grid-line" x1="520" y1="8" x2="520" y2="200"/>
+            <text class="tick" x="120" y="218" text-anchor="middle">0</text>
+            <text class="tick" x="320" y="218" text-anchor="middle">50</text>
+            <text class="tick" x="520" y="218" text-anchor="middle">100%</text>
+
+            <text class="row-label" x="0" y="36">Supported</text>
+            <rect data-tip="Supported · precision 71.4%" x="120" y="20" width="285.6" height="14" rx="3" fill="var(--bar-precision)"/>
+            <text class="val" x="413.6" y="31">71.4</text>
+            <rect data-tip="Supported · recall 100%" x="120" y="37" width="400" height="14" rx="3" fill="var(--bar-recall)"/>
+            <text class="val" x="472" y="48" fill="#f3ede4">100</text>
+
+            <text class="row-label" x="0" y="104">Contradicted</text>
+            <rect data-tip="Contradicted · precision 71.4%" x="120" y="88" width="285.6" height="14" rx="3" fill="var(--bar-precision)"/>
+            <text class="val" x="413.6" y="99">71.4</text>
+            <rect data-tip="Contradicted · recall 100%" x="120" y="105" width="400" height="14" rx="3" fill="var(--bar-recall)"/>
+            <text class="val" x="472" y="116" fill="#f3ede4">100</text>
+
+            <text class="row-label" x="0" y="172">Unsupported</text>
+            <rect data-tip="Unsupported · precision 60%" x="120" y="156" width="240" height="14" rx="3" fill="var(--bar-precision)"/>
+            <text class="val" x="368" y="167">60</text>
+            <rect data-tip="Unsupported · recall 75%" x="120" y="173" width="300" height="14" rx="3" fill="var(--bar-recall)"/>
+            <text class="val" x="428" y="184">75</text>
+          </g>
+        </svg>
+      </div>
+      <p class="chart-note">Recall on contradicted claims is the number that matters most: a missed
+         lie is the one unforgivable error, so the prompt was tuned until it reached 100 and the
+         cost landed on precision, where a human still reviews every flag. Reproduce with
+         <code>uv run python -m evals</code>.</p>
+    </div>
+  </section>
+
+  <section class="block" id="scope">
+    <div class="kicker">03 · Scope</div>
+    <h3>Small on purpose.</h3>
+    <div class="cols">
+      <div class="card">
+        <h4>In</h4>
+        <ul>
+          <li>One page. Two boxes, a Check button, a gated Approve button.</li>
+          <li>Deterministic checking of numbers, money, percentages and years.</li>
+          <li>Model-checked prose with strict limits on what it may claim.</li>
+          <li>Inline highlights with a one-line reason on hover.</li>
+          <li>A shipped sample with exactly one planted error per state.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Out, deliberately</h4>
+        <ul>
+          <li>No accounts, saving, history or file upload.</li>
+          <li>No web lookups. The fact sheet is the only source of truth.</li>
+          <li>No rewriting. Vouch reports, the human edits.</li>
+          <li>Quote checking ships dark behind <code>CHECK_QUOTES</code>, off by default.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="spec">
+    <div class="kicker">04 · Spec first</div>
+    <h3>The spec is the contract.</h3>
+    <div class="specrow">
+      <div class="card">
+        <h4>Written before any code</h4>
+        <p>Twenty-three acceptance criteria, each one something you can watch happen or watch
+           fail. The commit history follows the spec's build order, test first. Revision 2 came
+           from live testing: a number that clashes with a labelled fact now goes red and blocks
+           Approve. <a href="https://github.com/samad-zeeshan/vouch/blob/main/SPEC.md">Read SPEC.md</a></p>
+      </div>
+      <div class="card">
+        <h4>Run it yourself</h4>
+        <p><code>uv run vouch</code> starts the server with the sample loaded.
+           <code>MODEL=off</code> works fully offline on the numeric layer. Set
+           <code>DEEPSEEK_API_KEY</code> to check prose. <code>uv run pytest</code> and
+           <code>uv run python -m evals</code> reproduce every number above.</p>
+      </div>
+    </div>
+  </section>
+</div>
 </main>
+
+<footer>
+  <span>Vouch · a press-release fact checker</span>
+  <span>Python 3.12 · FastAPI · DeepSeek · vanilla JS · pytest · GitHub Actions</span>
+</footer>
+
 <div id="tooltip" role="tooltip"></div>
 <script>
 (function () {
@@ -145,7 +403,8 @@
   const draft = $("draft"), facts = $("facts"), view = $("view");
   const checkBtn = $("check"), editBtn = $("edit"), approveBtn = $("approve");
   const summary = $("summary"), banner = $("banner"), approved = $("approved");
-  const mainEl = document.querySelector("main");
+  const gridEl = document.querySelector("#checker .grid");
+  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
@@ -213,8 +472,8 @@
     else approveBtn.setAttribute("data-tip", why);
   }
 
-  // The one intentional motion on the page: highlights fade in once, staggered, with the
-  // delay capped so a long draft never takes more than 400ms to light up. Only opacity moves.
+  // The one motion tied to the check itself: highlights fade in once, staggered, with the
+  // delay capped so a long draft never takes more than 400ms. Only opacity moves.
   function revealMarks() {
     view.querySelectorAll("mark").forEach((m, i) => {
       m.style.transitionDelay = Math.min(i * 25, 220) + "ms";
@@ -239,7 +498,7 @@
     // The old verdict dies the moment a new check starts, so Approve is inert while waiting.
     invalidate();
     draft.disabled = true; facts.disabled = true;
-    mainEl.classList.add("busy");
+    gridEl.classList.add("busy");
     try {
       let res;
       try {
@@ -263,7 +522,7 @@
     } finally {
       checkBtn.disabled = false; checkBtn.textContent = "Check";
       draft.disabled = false; facts.disabled = false;
-      mainEl.classList.remove("busy");
+      gridEl.classList.remove("busy");
     }
   }
 
@@ -285,6 +544,56 @@
   });
   draft.addEventListener("input", invalidate);
   facts.addEventListener("input", invalidate);
+
+  // Background glow that trails the pointer. Decorative, so it stays cheap: transform only,
+  // one rAF loop that sleeps when the glow catches up, gone for touch and reduced motion.
+  const glow = $("glow");
+  if (glow && matchMedia("(pointer: fine)").matches && !calm) {
+    let tx = innerWidth * 0.6, ty = 220, x = tx, y = ty, raf = null;
+    const step = () => {
+      x += (tx - x) * 0.09; y += (ty - y) * 0.09;
+      glow.style.transform = "translate(" + (x - 320) + "px," + (y - 320) + "px)";
+      raf = Math.abs(tx - x) + Math.abs(ty - y) > 0.5 ? requestAnimationFrame(step) : null;
+    };
+    step();
+    addEventListener("pointermove", (e) => {
+      tx = e.clientX; ty = e.clientY;
+      if (!raf) raf = requestAnimationFrame(step);
+    });
+  } else if (glow) {
+    glow.hidden = true;
+  }
+
+  // Cards rise in and the stat numbers count up, once, on first sight. Both are skipped
+  // entirely under reduced motion rather than shown in their hidden state.
+  if (!calm && "IntersectionObserver" in window) {
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        e.target.classList.add("in");
+        e.target.addEventListener("transitionend",
+          () => { e.target.style.transitionDelay = ""; }, { once: true });
+        e.target.querySelectorAll("b[data-count]").forEach(countUp);
+        io.unobserve(e.target);
+      }
+    }, { threshold: 0.25 });
+    document.querySelectorAll(".card, .stat").forEach((el, i) => {
+      el.classList.add("reveal");
+      el.style.transitionDelay = (i % 4) * 40 + "ms";
+      io.observe(el);
+    });
+  }
+
+  function countUp(el) {
+    const target = +el.dataset.count, suffix = el.dataset.suffix || "";
+    const t0 = performance.now(), dur = 600;
+    const tick = (t) => {
+      const p = Math.min((t - t0) / dur, 1), eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased) + suffix;
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
 
   fetch("/sample").then((r) => r.json()).then((s) => { draft.value = s.draft; facts.value = s.facts; });
 })();
