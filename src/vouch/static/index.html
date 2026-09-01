@@ -16,6 +16,9 @@
   label { display: block; font-weight: 600; margin-bottom: 6px; }
   textarea, .view { width: 100%; min-height: 380px; padding: 14px; font: 15px/1.6 Georgia, serif; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
   textarea { resize: vertical; }
+  textarea:disabled { background: #fff; color: inherit; }
+  #draft, .view { transition: opacity 150ms ease-out; }
+  main.busy #draft, main.busy .view { opacity: .6; }
   .view { white-space: pre-wrap; overflow-wrap: anywhere; }
   .actions { grid-column: 1 / -1; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
   button { padding: 9px 18px; font: inherit; border-radius: 6px; border: 1px solid #333; background: #333; color: #fff; cursor: pointer; }
@@ -81,6 +84,7 @@
   const draft = $("draft"), facts = $("facts"), view = $("view");
   const checkBtn = $("check"), editBtn = $("edit"), approveBtn = $("approve");
   const summary = $("summary"), banner = $("banner"), approved = $("approved");
+  const mainEl = document.querySelector("main");
 
   const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
@@ -171,7 +175,10 @@
 
   async function runCheck() {
     checkBtn.disabled = true; checkBtn.textContent = "Checking...";
-    approved.hidden = true;
+    // The old verdict dies the moment a new check starts, so Approve is inert while waiting.
+    invalidate();
+    draft.disabled = true; facts.disabled = true;
+    mainEl.classList.add("busy");
     try {
       let res;
       try {
@@ -194,6 +201,8 @@
       setApprove(result.approvable, blockers(result));
     } finally {
       checkBtn.disabled = false; checkBtn.textContent = "Check";
+      draft.disabled = false; facts.disabled = false;
+      mainEl.classList.remove("busy");
     }
   }
 
