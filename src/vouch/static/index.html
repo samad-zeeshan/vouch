@@ -128,11 +128,20 @@
     }
   }
 
+  // Any edit to either box kills the verdict. The whole point of the tool is that a stale
+  // Approve can never be clicked, so this must cover the draft too, not just the sheet.
+  function invalidate() {
+    approveBtn.disabled = true;
+    approveBtn.title = "Run a check first";
+    summary.textContent = "";
+    approved.hidden = true;
+  }
+
   checkBtn.addEventListener("click", runCheck);
   editBtn.addEventListener("click", showEditor);
   approveBtn.addEventListener("click", () => { approved.hidden = false; });
-  // Editing the sheet invalidates the last verdict, so Approve goes dark until the next Check.
-  facts.addEventListener("input", () => { approveBtn.disabled = true; approveBtn.title = "Run a check first"; });
+  draft.addEventListener("input", invalidate);
+  facts.addEventListener("input", invalidate);
 
   fetch("/sample").then((r) => r.json()).then((s) => { draft.value = s.draft; facts.value = s.facts; });
 })();
