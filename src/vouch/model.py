@@ -95,6 +95,10 @@ class DeepSeekProse:
         import openai
 
         system, user = build_prompt(draft, sheet)
+        # The SDK refuses to build a client without a key. Say which key, so the banner on
+        # the page tells the person exactly what to set.
+        if self.client is None and not os.environ.get(API_KEY_ENV):
+            return ProseResult(error=f"{API_KEY_ENV} is not set")
         try:
             response = self._client().chat.completions.create(
                 model=MODEL_ID,
@@ -107,8 +111,9 @@ class DeepSeekProse:
             )
         except openai.APITimeoutError:
             return ProseResult(error=f"model timed out after {TIMEOUT_SECONDS:g} s")
-        # Every other API failure degrades the same way (AC-014), so one handler is enough.
-        except openai.APIError as e:
+        # Every other failure degrades the same way (AC-014). OpenAIError is the SDK's root
+        # class, so this also covers client construction, not only the request.
+        except openai.OpenAIError as e:
             return ProseResult(error=f"model call failed ({type(e).__name__})")
 
         choice = response.choices[0]

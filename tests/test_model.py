@@ -120,6 +120,13 @@ def test_timeout_degrades_with_the_reason():
     assert r.claims == []
 
 
+def test_missing_key_degrades_and_names_the_key(monkeypatch):
+    monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
+    r = DeepSeekProse().check(DRAFT, SHEET)
+    assert r.error == "DEEPSEEK_API_KEY is not set"
+    assert r.claims == []
+
+
 def test_malformed_json_degrades():
     r = DeepSeekProse(client=FakeClient(reply="{not json")).check(DRAFT, SHEET)
     assert r.error == "model returned malformed JSON"
