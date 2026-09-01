@@ -106,14 +106,26 @@
     view.hidden = true; draft.hidden = false; editBtn.hidden = true;
   }
 
+  function failCheck(why) {
+    banner.textContent = "The check could not run: " + why + ". Nothing was checked.";
+    banner.classList.add("show");
+    invalidate();
+  }
+
   async function runCheck() {
     checkBtn.disabled = true; checkBtn.textContent = "Checking...";
     approved.hidden = true;
     try {
-      const res = await fetch("/check", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ draft: draft.value, facts: facts.value }),
-      });
+      let res;
+      try {
+        res = await fetch("/check", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ draft: draft.value, facts: facts.value }),
+        });
+      } catch {
+        return failCheck("no connection");
+      }
+      if (!res.ok) return failCheck(String(res.status));
       const result = await res.json();
       view.innerHTML = render(draft.value, result.claims);
       draft.hidden = true; view.hidden = false; editBtn.hidden = false;
