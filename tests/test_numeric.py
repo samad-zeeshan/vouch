@@ -46,6 +46,13 @@ def test_years_get_no_tolerance_even_when_close():
     assert one("Founded in 2020.").state == "contradicted"
 
 
+def test_number_clashing_with_a_labelled_fact_is_contradicted():
+    sheet = parse_facts("Funding round: $22 million\n")
+    c = one("Falcon Pay closed a $13 million funding round.", sheet)
+    assert (c.state, c.fact_id) == ("contradicted", "F1")
+    assert c.reason == "Sheet says $22M. Draft says $13M."
+
+
 def test_number_with_nothing_close_is_unsupported():
     c = one("It has 900 employees.")
     assert c.state == "unsupported"

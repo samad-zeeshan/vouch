@@ -1,0 +1,12 @@
+{
+  "name": "16-label-clash-contradicted",
+  "layer": "numeric",
+  "draft": "Falcon Pay closed a $13 million funding round.",
+  "facts": "Company: Falcon Pay\nFunding round: $22 million\n",
+  "expected": [
+    {
+      "text": "$13 million",
+      "state": "contradicted"
+    }
+  ]
+}

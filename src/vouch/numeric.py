@@ -92,6 +92,12 @@ def _verdict(d: Number, cands: list[SheetNumber], sentence: str) -> Claim:
 
     near = [c for c in cands if abs(d.value - c.number.value) / max(c.number.value, 1) <= TOLERANCE]
     if not near:
+        # Outside tolerance usually means the sheet does not speak to this number. But when the
+        # fact's own label sits in the same sentence, it does speak, and it disagrees (AC-023).
+        labelled = [c for c in cands if _label_in(c.fact, sentence)]
+        if labelled:
+            best = ranked(labelled)[0]
+            return claim("contradicted", f"Sheet says {fmt(best.number)}. Draft says {fmt(d)}.", best.fact)
         return claim("unsupported", f"No number on the sheet is within 25 percent of {fmt(d)}.")
     best = ranked(near)[0]
     if d.value > best.number.value:
