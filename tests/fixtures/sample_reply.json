@@ -1,0 +1,46 @@
+{
+  "claims": [
+    {
+      "text": "the fastest-growing fintech in the Gulf",
+      "sentence": "Falcon Pay, the fastest-growing fintech in the Gulf, today announced it has closed a $13 million Series A funding round led by Gulf Ventures.",
+      "state": "unsupported",
+      "fact_id": null,
+      "reason": "No growth or ranking fact on the sheet."
+    },
+    {
+      "text": "Series A funding round",
+      "sentence": "Falcon Pay, the fastest-growing fintech in the Gulf, today announced it has closed a $13 million Series A funding round led by Gulf Ventures.",
+      "state": "supported",
+      "fact_id": "F2",
+      "reason": "The sheet lists the round as Series A."
+    },
+    {
+      "text": "led by Gulf Ventures",
+      "sentence": "Falcon Pay, the fastest-growing fintech in the Gulf, today announced it has closed a $13 million Series A funding round led by Gulf Ventures.",
+      "state": "supported",
+      "fact_id": "F7",
+      "reason": "Gulf Ventures is the lead investor on the sheet."
+    },
+    {
+      "text": "cross-border payments app for small businesses",
+      "sentence": "The round will fund the expansion of its cross-border payments app for small businesses across the region.",
+      "state": "supported",
+      "fact_id": "F8",
+      "reason": "Matches the product description on the sheet."
+    },
+    {
+      "text": "headquartered in Dubai",
+      "sentence": "The company is headquartered in Dubai and led by CEO Layla Haddad.",
+      "state": "supported",
+      "fact_id": "F6",
+      "reason": "The sheet gives Dubai as the headquarters."
+    },
+    {
+      "text": "led by CEO Layla Haddad",
+      "sentence": "The company is headquartered in Dubai and led by CEO Layla Haddad.",
+      "state": "supported",
+      "fact_id": "F4",
+      "reason": "Layla Haddad is the CEO on the sheet."
+    }
+  ]
+}

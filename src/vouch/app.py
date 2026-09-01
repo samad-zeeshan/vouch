@@ -8,6 +8,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from vouch.check import check
+from vouch.config import build_prose_checker
 
 STATIC = Path(__file__).parent / "static"
 # The sample lives at the repo root because the spec names that path. It is only there when
@@ -37,7 +38,7 @@ def sample() -> dict:
 
 @app.post("/check")
 def run_check(req: CheckRequest) -> dict:
-    return check(req.draft, req.facts).to_dict()
+    return check(req.draft, req.facts, build_prose_checker()).to_dict()
 
 
 def main() -> None:
