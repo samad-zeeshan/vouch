@@ -20,7 +20,7 @@
   .actions { grid-column: 1 / -1; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
   button { padding: 9px 18px; font: inherit; border-radius: 6px; border: 1px solid #333; background: #333; color: #fff; cursor: pointer; }
   button.secondary { background: #fff; color: var(--ink); }
-  button:disabled { opacity: .45; cursor: not-allowed; }
+  button:disabled, button[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
   #banner { grid-column: 1 / -1; display: none; padding: 10px 14px; border-radius: 6px; background: #fff3cd; border: 1px solid #f0d27a; }
   #banner.show { display: block; }
   mark { padding: 1px 2px; border-radius: 3px; background: none; color: inherit; cursor: help; }
@@ -31,6 +31,15 @@
   .legend { grid-column: 1 / -1; color: var(--muted); font-size: 13px; }
   .legend mark { margin-right: 10px; }
   #approved { font-weight: 600; color: #1b5e20; }
+  #tooltip { position: absolute; z-index: 10; max-width: 320px; padding: 6px 10px;
+    font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; background: #1c1c1c;
+    color: #fff; border-radius: 5px; opacity: 0; transform: translateY(4px);
+    transition: opacity 120ms ease-out, transform 120ms ease-out; pointer-events: none; }
+  #tooltip.below { transform: translateY(-4px); }
+  #tooltip.show { opacity: 1; transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
 </style>
 </head>
 <body>
@@ -52,7 +61,7 @@
   <div class="actions">
     <button id="check">Check</button>
     <button id="edit" class="secondary" hidden>Edit draft</button>
-    <button id="approve" disabled title="Run a check first">Approve</button>
+    <button id="approve" aria-disabled="true" data-tip="Run a check first">Approve</button>
     <span id="approved" hidden>Approved</span>
     <span id="summary"></span>
   </div>
@@ -63,6 +72,7 @@
     <mark class="unsupported">unsupported</mark>
   </div>
 </main>
+<div id="tooltip" role="tooltip"></div>
 <script>
 (function () {
   const $ = (id) => document.getElementById(id);
@@ -80,7 +90,7 @@
     let out = "", pos = 0;
     for (const c of claims) {
       out += esc(cps.slice(pos, c.start).join(""));
-      out += '<mark class="' + c.state + '" title="' + esc(c.reason) + '">' +
+      out += '<mark class="' + c.state + '" tabindex="0" data-tip="' + esc(c.reason) + '">' +
              esc(cps.slice(c.start, c.end).join("")) + '</mark>';
       pos = c.end;
     }
@@ -100,6 +110,40 @@
     if (loose) parts.push(loose + (loose > 1 ? " numbers" : " number") + " not on the sheet");
     if (!result.model_used) parts.push("prose claims were not checked");
     return parts.join(", ");
+  }
+
+  const tip = $("tooltip");
+
+  // One shared bubble instead of the native title. Native tooltips wait a second, cannot be
+  // styled, and barely register in a screen recording, which is where this page lives.
+  function showTip(target) {
+    const text = target.getAttribute("data-tip");
+    if (!text) return;
+    tip.textContent = text;
+    const r = target.getBoundingClientRect();
+    const above = r.top - tip.offsetHeight - 8 >= 0;
+    tip.classList.toggle("below", !above);
+    tip.style.top = scrollY + (above ? r.top - tip.offsetHeight - 8 : r.bottom + 8) + "px";
+    const left = scrollX + r.left + r.width / 2 - tip.offsetWidth / 2;
+    tip.style.left = Math.max(8, Math.min(left, scrollX + innerWidth - tip.offsetWidth - 16)) + "px";
+    tip.classList.add("show");
+    target.setAttribute("aria-describedby", "tooltip");
+  }
+
+  function hideTip(target) {
+    tip.classList.remove("show");
+    target.removeAttribute("aria-describedby");
+  }
+
+  for (const [over, out] of [["mouseover", "mouseout"], ["focusin", "focusout"]]) {
+    document.addEventListener(over, (e) => { const t = e.target.closest("[data-tip]"); if (t) showTip(t); });
+    document.addEventListener(out, (e) => { const t = e.target.closest("[data-tip]"); if (t) hideTip(t); });
+  }
+
+  function setApprove(enabled, why) {
+    approveBtn.setAttribute("aria-disabled", String(!enabled));
+    if (enabled) { approveBtn.removeAttribute("data-tip"); hideTip(approveBtn); }
+    else approveBtn.setAttribute("data-tip", why);
   }
 
   function showEditor() {
@@ -133,8 +177,7 @@
       const why = result.warnings.filter((w) => !w.startsWith("model verdict"));
       banner.textContent = why.join(" ");
       banner.classList.toggle("show", why.length > 0);
-      approveBtn.disabled = !result.approvable;
-      approveBtn.title = result.approvable ? "" : blockers(result);
+      setApprove(result.approvable, blockers(result));
     } finally {
       checkBtn.disabled = false; checkBtn.textContent = "Check";
     }
@@ -143,15 +186,19 @@
   // Any edit to either box kills the verdict. The whole point of the tool is that a stale
   // Approve can never be clicked, so this must cover the draft too, not just the sheet.
   function invalidate() {
-    approveBtn.disabled = true;
-    approveBtn.title = "Run a check first";
+    setApprove(false, "Run a check first");
     summary.textContent = "";
     approved.hidden = true;
   }
 
   checkBtn.addEventListener("click", runCheck);
   editBtn.addEventListener("click", showEditor);
-  approveBtn.addEventListener("click", () => { approved.hidden = false; });
+  // aria-disabled instead of disabled: a disabled button gets no hover events, and the
+  // reason this button is off is the third beat of the demo.
+  approveBtn.addEventListener("click", () => {
+    if (approveBtn.getAttribute("aria-disabled") === "true") return;
+    approved.hidden = false;
+  });
   draft.addEventListener("input", invalidate);
   facts.addEventListener("input", invalidate);
 
