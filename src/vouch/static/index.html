@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vouch</title>
+<style>
+  :root { --ink: #1c1c1c; --muted: #666; --line: #ddd; --green: #d8f3dc; --orange: #ffe0b2; --red: #ffd6d6; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); background: #fafafa; }
+  header { padding: 18px 28px; border-bottom: 1px solid var(--line); background: #fff; display: flex; align-items: baseline; gap: 16px; }
+  header h1 { margin: 0; font-size: 20px; }
+  header p { margin: 0; color: var(--muted); }
+  main { max-width: 1200px; margin: 0 auto; padding: 24px 28px; display: grid; grid-template-columns: 3fr 2fr; gap: 24px; }
+  @media (max-width: 800px) { main { grid-template-columns: 1fr; } }
+  label { display: block; font-weight: 600; margin-bottom: 6px; }
+  textarea, .view { width: 100%; min-height: 380px; padding: 14px; font: 15px/1.6 Georgia, serif; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+  textarea { resize: vertical; }
+  .view { white-space: pre-wrap; overflow-wrap: anywhere; }
+  .actions { grid-column: 1 / -1; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  button { padding: 9px 18px; font: inherit; border-radius: 6px; border: 1px solid #333; background: #333; color: #fff; cursor: pointer; }
+  button.secondary { background: #fff; color: var(--ink); }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  #banner { grid-column: 1 / -1; display: none; padding: 10px 14px; border-radius: 6px; background: #fff3cd; border: 1px solid #f0d27a; }
+  #banner.show { display: block; }
+  mark { padding: 1px 2px; border-radius: 3px; background: none; color: inherit; cursor: help; }
+  mark.supported { background: var(--green); }
+  mark.rounded_up { background: var(--orange); }
+  mark.contradicted { background: var(--red); }
+  mark.unsupported { text-decoration: underline dashed #777; text-underline-offset: 3px; }
+  .legend { grid-column: 1 / -1; color: var(--muted); font-size: 13px; }
+  .legend mark { margin-right: 10px; }
+  #approved { font-weight: 600; color: #1b5e20; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Vouch</h1>
+  <p>Paste the draft and the client's approved fact sheet. Click Check.</p>
+</header>
+<main>
+  <section>
+    <label for="draft">Draft release</label>
+    <textarea id="draft" spellcheck="false"></textarea>
+    <div id="view" class="view" hidden></div>
+  </section>
+  <section>
+    <label for="facts">Approved fact sheet</label>
+    <textarea id="facts" spellcheck="false"></textarea>
+  </section>
+  <div id="banner"></div>
+  <div class="actions">
+    <button id="check">Check</button>
+    <button id="edit" class="secondary" hidden>Edit draft</button>
+    <button id="approve" disabled title="Run a check first">Approve</button>
+    <span id="approved" hidden>Approved</span>
+    <span id="summary"></span>
+  </div>
+  <div class="legend">
+    <mark class="supported">supported</mark>
+    <mark class="rounded_up">rounded up</mark>
+    <mark class="contradicted">contradicted</mark>
+    <mark class="unsupported">unsupported</mark>
+  </div>
+</main>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const draft = $("draft"), facts = $("facts"), view = $("view");
+  const checkBtn = $("check"), editBtn = $("edit"), approveBtn = $("approve");
+  const summary = $("summary"), banner = $("banner"), approved = $("approved");
+
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  // The server counts offsets in code points. JavaScript strings count UTF-16 units, so an emoji
+  // before a claim would shift every later highlight by one. Slicing an array of code points
+  // keeps both sides counting the same way.
+  function render(text, claims) {
+    const cps = Array.from(text);
+    let out = "", pos = 0;
+    for (const c of claims) {
+      out += esc(cps.slice(pos, c.start).join(""));
+      out += '<mark class="' + c.state + '" title="' + esc(c.reason) + '">' +
+             esc(cps.slice(c.start, c.end).join("")) + '</mark>';
+      pos = c.end;
+    }
+    return out + esc(cps.slice(pos).join(""));
+  }
+
+  function words(s) {
+    return s.checked + " claims checked. " + s.supported + " supported. " + s.rounded_up +
+           " rounded up. " + s.contradicted + " contradicted. " + s.unsupported + " unsupported.";
+  }
+
+  function blockers(result) {
+    const s = result.summary, parts = [];
+    if (s.contradicted) parts.push(s.contradicted + " contradicted");
+    if (s.rounded_up) parts.push(s.rounded_up + " rounded up");
+    if (!result.model_used) parts.push("prose claims were not checked");
+    return parts.join(", ");
+  }
+
+  function showEditor() {
+    view.hidden = true; draft.hidden = false; editBtn.hidden = true;
+  }
+
+  async function runCheck() {
+    checkBtn.disabled = true; checkBtn.textContent = "Checking...";
+    approved.hidden = true;
+    try {
+      const res = await fetch("/check", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ draft: draft.value, facts: facts.value }),
+      });
+      const result = await res.json();
+      view.innerHTML = render(draft.value, result.claims);
+      draft.hidden = true; view.hidden = false; editBtn.hidden = false;
+      summary.textContent = words(result.summary);
+      const why = result.warnings.filter((w) => !w.startsWith("model verdict"));
+      banner.textContent = why.join(" ");
+      banner.classList.toggle("show", why.length > 0);
+      approveBtn.disabled = !result.approvable;
+      approveBtn.title = result.approvable ? "" : blockers(result);
+    } finally {
+      checkBtn.disabled = false; checkBtn.textContent = "Check";
+    }
+  }
+
+  checkBtn.addEventListener("click", runCheck);
+  editBtn.addEventListener("click", showEditor);
+  approveBtn.addEventListener("click", () => { approved.hidden = false; });
+  // Editing the sheet invalidates the last verdict, so Approve goes dark until the next Check.
+  facts.addEventListener("input", () => { approveBtn.disabled = true; approveBtn.title = "Run a check first"; });
+
+  fetch("/sample").then((r) => r.json()).then((s) => { draft.value = s.draft; facts.value = s.facts; });
+})();
+</script>
+</body>
+</html>
