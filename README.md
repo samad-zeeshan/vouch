@@ -12,6 +12,25 @@ Open http://localhost:8000. The sample draft and fact sheet are already loaded. 
 
 No API key? It still works. Numbers get checked, a banner tells you prose was not, and Approve stays locked. Set `DEEPSEEK_API_KEY` to check everything.
 
+## How it works
+
+Code checks the numbers, a model checks the prose, and the Approve button stays locked until nothing wrong or unapproved is left.
+
+![System overview](docs/diagrams/overview.png)
+The page sends the draft and the fact sheet to one FastAPI route. Code judges every number, DeepSeek judges the prose, and each model answer is checked before it counts.
+
+![One check, start to finish](docs/diagrams/main-flow.png)
+A single click on Check, in twelve numbered steps, from the POST to the highlights and the Approve decision.
+
+![When Approve unlocks](docs/diagrams/states.png)
+The states of the Approve button. Any edit to the draft or the sheet sends it back to Not checked.
+
+![How the evals score it](docs/diagrams/pipeline.png)
+The 28 labelled cases run through the real check. If number recall drops below 100 percent, the CI build fails.
+
+Interactive versions with pan, zoom and theme switch: `docs/diagrams/overview.html`, `docs/diagrams/main-flow.html`, `docs/diagrams/states.html`, `docs/diagrams/pipeline.html`
+
+
 ## The problem
 
 Ask any model to write a press release and it will hand you something fluent, confident, and slightly wrong. A funding round quietly rounds from $12.4 million up to $13 million. A founding year drifts by one. A "fastest-growing fintech in the Gulf" appears that nobody approved. Each mistake is small. Each one is the kind a client notices after it is published.
